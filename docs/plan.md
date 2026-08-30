@@ -41,10 +41,13 @@ Filled in as sessions complete.
 
 | Session | Estimate | Actual | Notes |
 |---------|----------|--------|-------|
-| 1 | 0.5h | _tbd_ | |
+| 1 | 0.5h | ~0.5h | Scaffold + local Postgres (Docker daemon unavailable → ran a native PG cluster). |
+| 2 | 0.75h | ~1.0h | Overran: Prisma blocked by sandbox egress; reversed to Kysely + SQL migrations. |
 
 ## Cuts
 
 Recorded here as they happen (things deferred when short on time).
 
-- _none yet_
+- **Prisma** cut in session 2 (environment couldn't fetch its engine binaries) → Kysely + `pg`.
+- Full-text search deferred: shipping `ilike` search now, `pg_trgm`/`tsvector` noted in schema.md
+  as the scale-up path rather than built for the demo.
