@@ -30,7 +30,7 @@
 
 | #  | Goal | Status | Notes |
 |----|------|--------|-------|
-| 1  | Auth + Manager/Member roles, authz server-side | Not started | |
+| 1  | Auth + Manager/Member roles, authz server-side | Done | JWT httpOnly cookie, bcrypt, requireAuth + requireRole middleware; project-scoped guards added with projects module |
 | 2  | Projects: create/edit/archive/restore + membership | Not started | |
 | 3  | Tasks: priorities, descriptions, due dates, blocking deps | Not started | |
 | 4  | Strict server-enforced task lifecycle | Not started | |

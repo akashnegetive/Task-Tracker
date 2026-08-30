@@ -2,6 +2,8 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './env';
+import api from './routes';
+import { errorHandler, notFoundHandler } from './middleware/error';
 
 /**
  * Builds the Express application. Kept as a factory (no listen) so tests can
@@ -19,9 +21,10 @@ export function createApp(): Express {
   app.use(express.json());
   app.use(cookieParser());
 
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
-  });
+  app.use('/api', api);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   return app;
 }
