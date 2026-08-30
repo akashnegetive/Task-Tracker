@@ -50,4 +50,15 @@ Decisions where a real alternative existed and I picked one. At least one was la
   schema, then dropped it when unifying on the event log. (The primary documented reversal is
   Decision 2; noting this here as the smaller design change it was.)
 
-## Decision 5 — _pending (recorded during a later session)_
+## Decision 5 — Single-service deployment (API serves the built SPA)
+
+- **Chose:** In production the Express server serves the built React app (static files +
+  SPA fallback) from the same origin as the API.
+- **Rejected:** Two separate deployments (static host for the client, web service for the API) with
+  cross-site cookies.
+- **Why:** The auth token is an httpOnly cookie. Two origins would force `SameSite=None` third-party
+  cookies, which are increasingly blocked by browsers and fiddly to get right on free tiers. Serving
+  both from one origin keeps the cookie first-party (`SameSite=Lax`), removes CORS from the hot path,
+  and means one deploy, one URL, one env to configure. The tradeoff is less independent scaling of
+  client vs API — irrelevant at this scale. (Dev still runs them separately with a Vite proxy for
+  fast HMR.)

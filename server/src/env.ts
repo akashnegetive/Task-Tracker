@@ -18,4 +18,6 @@ export const env = {
   jwtSecret: required('JWT_SECRET', 'dev-secret-change-me'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   clientOrigin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+  // Serve the built SPA from this server (single-service deploy). Auto-on in prod.
+  serveClient: process.env.SERVE_CLIENT === 'true' || process.env.NODE_ENV === 'production',
 };

@@ -25,8 +25,8 @@
 |----------|---------------------------------|-----|
 | Frontend | React + TypeScript (Vite)       | Clear client/server split; fast SPA dev. |
 | Backend  | Node + Express + TypeScript     | Single guarded API layer; easy to explain the request path. |
-| Database | PostgreSQL (Prisma ORM)         | Relational domain; type-safe models + easy migrations. |
-| Hosting  | _tbd_                           | |
+| Database | PostgreSQL (Kysely query builder) | Relational domain; typed SQL. Prisma was reversed (see decisions.md). |
+| Hosting  | Single service: API serves built SPA; managed Postgres | One origin → first-party cookie, no CORS in prod. |
 
 ## Goal checklist
 

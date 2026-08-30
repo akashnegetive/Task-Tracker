@@ -1,3 +1,4 @@
+import path from 'node:path';
 import express, { type Express } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -23,7 +24,17 @@ export function createApp(): Express {
 
   app.use('/api', api);
 
-  app.use(notFoundHandler);
+  if (env.serveClient) {
+    // Single-service deploy: serve the built SPA and fall back to index.html
+    // for client-side routes. API 404s are still JSON (handled below first).
+    const clientDist = path.resolve(__dirname, '../../client/dist');
+    app.use(express.static(clientDist));
+    app.get(/^\/(?!api).*/, (_req, res) => {
+      res.sendFile(path.join(clientDist, 'index.html'));
+    });
+  }
+
+  app.use('/api', notFoundHandler);
   app.use(errorHandler);
 
   return app;
