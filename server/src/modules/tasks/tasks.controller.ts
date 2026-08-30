@@ -1,7 +1,29 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as service from './tasks.service';
+import { listTasks } from './tasks.list';
+import type { ListTasksQuery } from './tasks.schemas';
 
 const u = (req: Request) => req.user!;
+
+export async function listByProject(req: Request, res: Response, next: NextFunction) {
+  try {
+    const query = res.locals.query as ListTasksQuery;
+    const result = await listTasks(u(req), { kind: 'project', projectId: req.params.projectId }, query);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function listMine(req: Request, res: Response, next: NextFunction) {
+  try {
+    const query = res.locals.query as ListTasksQuery;
+    const result = await listTasks(u(req), { kind: 'assignee', userId: u(req).id }, query);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {

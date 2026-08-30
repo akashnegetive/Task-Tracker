@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ZodError, type ZodSchema } from 'zod';
+import { ZodError, type ZodTypeAny } from 'zod';
 import { badRequest } from './errors';
 
 /** Validates req.body against a zod schema, replacing it with the parsed value. */
-export function validateBody<T>(schema: ZodSchema<T>) {
+export function validateBody(schema: ZodTypeAny) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = schema.parse(req.body);
@@ -19,7 +19,7 @@ export function validateBody<T>(schema: ZodSchema<T>) {
 }
 
 /** Validates req.query, storing the parsed result on res.locals.query (req.query is read-only). */
-export function validateQuery<T>(schema: ZodSchema<T>) {
+export function validateQuery(schema: ZodTypeAny) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       res.locals.query = schema.parse(req.query);

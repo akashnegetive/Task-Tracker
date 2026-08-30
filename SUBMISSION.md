@@ -34,8 +34,8 @@
 | 2  | Projects: create/edit/archive/restore + membership | Done | Managers manage all; members scoped to membership; archive is soft (restore lossless) |
 | 3  | Tasks: priorities, descriptions, due dates, blocking deps | Done | Same-project + cycle-safe dependencies; isBlocked/isOverdue computed |
 | 4  | Strict server-enforced task lifecycle | Done | State machine + dependency gate + assignee/manager-only transitions |
-| 5  | Multi-assignee tasks + "my tasks" | Not started | |
-| 6  | Server-side search/filter/sort/pagination | Not started | |
+| 5  | Multi-assignee tasks + "my tasks" | Done | assign/unassign + /api/tasks/mine across projects |
+| 6  | Server-side search/filter/sort/pagination | Done | shared query engine; search, multi-filter, severity sort, offset pagination |
 | 7  | Bulk operations with per-task result + CSV export | Not started | |
 | 8  | Dashboard: metrics, breakdowns, 8-week chart | Not started | |
 | 9  | Immutable history/timeline incl. comments | Not started | |
