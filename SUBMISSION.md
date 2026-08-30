@@ -37,7 +37,7 @@
 | 5  | Multi-assignee tasks + "my tasks" | Done | assign/unassign + /api/tasks/mine across projects |
 | 6  | Server-side search/filter/sort/pagination | Done | shared query engine; search, multi-filter, severity sort, offset pagination |
 | 7  | Bulk operations with per-task result + CSV export | Done | independent per-task results (transition/priority/due/assign); filtered CSV w/ RFC-4180 escaping |
-| 8  | Dashboard: metrics, breakdowns, 8-week chart | Not started | |
+| 8  | Dashboard: metrics, breakdowns, 8-week chart | Done | totals/open/completed/overdue/dueSoon, status+priority breakdowns, 8-week completion buckets |
 | 9  | Immutable history/timeline incl. comments | Done | append-only task_events; enriched chronological timeline; comments as events |
 | 10 | Overdue alerts with dismissal/reappearance | Done | per-user dismissal; reappears when due date changes; clears when completed/rescheduled ahead |
 
