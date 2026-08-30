@@ -38,7 +38,7 @@
 | 6  | Server-side search/filter/sort/pagination | Done | shared query engine; search, multi-filter, severity sort, offset pagination |
 | 7  | Bulk operations with per-task result + CSV export | Not started | |
 | 8  | Dashboard: metrics, breakdowns, 8-week chart | Not started | |
-| 9  | Immutable history/timeline incl. comments | Not started | |
+| 9  | Immutable history/timeline incl. comments | Done | append-only task_events; enriched chronological timeline; comments as events |
 | 10 | Overdue alerts with dismissal/reappearance | Not started | |
 
 ## How much time did I actually spend?

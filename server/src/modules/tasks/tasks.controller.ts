@@ -1,9 +1,28 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as service from './tasks.service';
 import { listTasks } from './tasks.list';
+import { getTimeline, addComment } from './tasks.timeline';
 import type { ListTasksQuery } from './tasks.schemas';
 
 const u = (req: Request) => req.user!;
+
+export async function timeline(req: Request, res: Response, next: NextFunction) {
+  try {
+    const items = await getTimeline(u(req), req.params.taskId);
+    res.json({ timeline: items });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function comment(req: Request, res: Response, next: NextFunction) {
+  try {
+    const items = await addComment(u(req), req.params.taskId, req.body.body);
+    res.status(201).json({ timeline: items });
+  } catch (err) {
+    next(err);
+  }
+}
 
 export async function listByProject(req: Request, res: Response, next: NextFunction) {
   try {

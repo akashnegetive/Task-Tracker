@@ -9,6 +9,7 @@ import {
   assignSchema,
   addDependencySchema,
   listTasksQuery,
+  commentSchema,
 } from './tasks.schemas';
 
 /** Mounted at /api/projects/:projectId/tasks (mergeParams to see :projectId). */
@@ -28,3 +29,5 @@ tasksRouter.post('/:taskId/assignees', validateBody(assignSchema), controller.as
 tasksRouter.delete('/:taskId/assignees/:userId', controller.unassign);
 tasksRouter.post('/:taskId/dependencies', validateBody(addDependencySchema), controller.addDependency);
 tasksRouter.delete('/:taskId/dependencies/:depId', controller.removeDependency);
+tasksRouter.get('/:taskId/timeline', controller.timeline);
+tasksRouter.post('/:taskId/comments', validateBody(commentSchema), controller.comment);
