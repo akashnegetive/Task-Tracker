@@ -39,7 +39,7 @@
 | 7  | Bulk operations with per-task result + CSV export | Done | independent per-task results (transition/priority/due/assign); filtered CSV w/ RFC-4180 escaping |
 | 8  | Dashboard: metrics, breakdowns, 8-week chart | Not started | |
 | 9  | Immutable history/timeline incl. comments | Done | append-only task_events; enriched chronological timeline; comments as events |
-| 10 | Overdue alerts with dismissal/reappearance | Not started | |
+| 10 | Overdue alerts with dismissal/reappearance | Done | per-user dismissal; reappears when due date changes; clears when completed/rescheduled ahead |
 
 ## How much time did I actually spend?
 
