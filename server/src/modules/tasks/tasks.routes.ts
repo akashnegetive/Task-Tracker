@@ -11,17 +11,21 @@ import {
   listTasksQuery,
   commentSchema,
 } from './tasks.schemas';
+import { bulkSchema } from './tasks.bulk';
 
 /** Mounted at /api/projects/:projectId/tasks (mergeParams to see :projectId). */
 export const projectTasksRouter = Router({ mergeParams: true });
 projectTasksRouter.get('/', validateQuery(listTasksQuery), controller.listByProject);
+projectTasksRouter.get('/export', validateQuery(listTasksQuery), controller.exportByProject);
 projectTasksRouter.post('/', validateBody(createTaskSchema), controller.create);
 
 /** Mounted at /api/tasks — operations on a single task. */
 export const tasksRouter = Router();
 tasksRouter.use(requireAuth);
-// "My tasks" across all projects — declared before /:taskId so it isn't shadowed.
+// Static routes before /:taskId so they aren't shadowed.
 tasksRouter.get('/mine', validateQuery(listTasksQuery), controller.listMine);
+tasksRouter.get('/mine/export', validateQuery(listTasksQuery), controller.exportMine);
+tasksRouter.post('/bulk', validateBody(bulkSchema), controller.bulk);
 tasksRouter.get('/:taskId', controller.getOne);
 tasksRouter.patch('/:taskId', validateBody(updateTaskSchema), controller.update);
 tasksRouter.post('/:taskId/transition', validateBody(transitionSchema), controller.transition);

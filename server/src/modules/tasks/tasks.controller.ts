@@ -1,10 +1,49 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as service from './tasks.service';
-import { listTasks } from './tasks.list';
+import { listTasks, exportTasks, type Scope } from './tasks.list';
 import { getTimeline, addComment } from './tasks.timeline';
+import { bulkApply } from './tasks.bulk';
+import { toCsv } from '../../lib/csv';
 import type { ListTasksQuery } from './tasks.schemas';
 
 const u = (req: Request) => req.user!;
+
+export async function bulk(req: Request, res: Response, next: NextFunction) {
+  try {
+    const result = await bulkApply(u(req), req.body);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function exportCsv(req: Request, res: Response, next: NextFunction, scope: Scope) {
+  try {
+    const query = res.locals.query as ListTasksQuery;
+    const rows = await exportTasks(u(req), scope, query);
+    const csv = toCsv(rows, [
+      { header: 'id', value: (r) => r.id },
+      { header: 'title', value: (r) => r.title },
+      { header: 'status', value: (r) => r.status },
+      { header: 'priority', value: (r) => r.priority },
+      { header: 'assignees', value: (r) => r.assignees.map((a) => a.name).join('; ') },
+      { header: 'dueDate', value: (r) => (r.dueDate ? new Date(r.dueDate).toISOString() : '') },
+      { header: 'isOverdue', value: (r) => r.isOverdue },
+      { header: 'createdAt', value: (r) => new Date(r.createdAt).toISOString() },
+      { header: 'completedAt', value: (r) => (r.completedAt ? new Date(r.completedAt).toISOString() : '') },
+    ]);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="tasks-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const exportByProject = (req: Request, res: Response, next: NextFunction) =>
+  exportCsv(req, res, next, { kind: 'project', projectId: req.params.projectId });
+export const exportMine = (req: Request, res: Response, next: NextFunction) =>
+  exportCsv(req, res, next, { kind: 'assignee', userId: req.user!.id });
 
 export async function timeline(req: Request, res: Response, next: NextFunction) {
   try {

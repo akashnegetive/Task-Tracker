@@ -27,22 +27,15 @@ export interface Paginated<T> {
   totalPages: number;
 }
 
-type Scope = { kind: 'project'; projectId: string } | { kind: 'assignee'; userId: string };
+export type Scope = { kind: 'project'; projectId: string } | { kind: 'assignee'; userId: string };
 
 const OPEN_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW'] as const;
 
-/** Shared, server-side task query: search + filter + sort + pagination. */
-export async function listTasks(
-  user: AuthUser,
-  scope: Scope,
-  q: ListTasksQuery,
-): Promise<Paginated<TaskListItem>> {
-  if (scope.kind === 'project') {
-    await assertProjectAccess(user, scope.projectId); // authorization
-  }
-
+/** Builds the shared WHERE conditions for scope + filters (used by list and export). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildConditions(scope: Scope, q: ListTasksQuery) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where = (eb: any): Expression<SqlBool>[] => {
+  return (eb: any): Expression<SqlBool>[] => {
     const conds: Expression<SqlBool>[] = [];
 
     if (scope.kind === 'project') {
@@ -98,6 +91,19 @@ export async function listTasks(
     }
     return conds;
   };
+}
+
+/** Shared, server-side task query: search + filter + sort + pagination. */
+export async function listTasks(
+  user: AuthUser,
+  scope: Scope,
+  q: ListTasksQuery,
+): Promise<Paginated<TaskListItem>> {
+  if (scope.kind === 'project') {
+    await assertProjectAccess(user, scope.projectId); // authorization
+  }
+
+  const where = buildConditions(scope, q);
 
   // Total count
   const totalRow = await db
@@ -184,4 +190,47 @@ export async function listTasks(
   }));
 
   return { items, page: q.page, pageSize: q.pageSize, total, totalPages: Math.max(1, Math.ceil(total / q.pageSize)) };
+}
+
+/** All matching tasks (no pagination) with assignee names — for CSV export. */
+export async function exportTasks(user: AuthUser, scope: Scope, q: ListTasksQuery): Promise<TaskListItem[]> {
+  if (scope.kind === 'project') await assertProjectAccess(user, scope.projectId);
+  const where = buildConditions(scope, q);
+
+  const rows = await db
+    .selectFrom('tasks as t')
+    .select(['t.id', 't.project_id as projectId', 't.title', 't.priority', 't.status', 't.due_date as dueDate', 't.completed_at as completedAt', 't.created_at as createdAt'])
+    .where((eb) => eb.and(where(eb)))
+    .orderBy('t.created_at', 'desc')
+    .execute();
+
+  const ids = rows.map((r) => r.id);
+  const assigneeRows = ids.length
+    ? await db
+        .selectFrom('task_assignees as ta')
+        .innerJoin('users as u', 'u.id', 'ta.user_id')
+        .select(['ta.task_id', 'u.id', 'u.name'])
+        .where('ta.task_id', 'in', ids)
+        .execute()
+    : [];
+  const byTask = new Map<string, { id: string; name: string }[]>();
+  for (const a of assigneeRows) {
+    const list = byTask.get(a.task_id) ?? [];
+    list.push({ id: a.id, name: a.name });
+    byTask.set(a.task_id, list);
+  }
+  const now = Date.now();
+  return rows.map((r) => ({
+    id: r.id,
+    projectId: r.projectId,
+    title: r.title,
+    priority: r.priority,
+    status: r.status,
+    dueDate: r.dueDate,
+    completedAt: r.completedAt,
+    createdAt: r.createdAt,
+    isOverdue: r.dueDate !== null && r.status !== 'DONE' && r.status !== 'CANCELLED' && new Date(r.dueDate).getTime() < now,
+    isBlocked: false,
+    assignees: byTask.get(r.id) ?? [],
+  }));
 }
