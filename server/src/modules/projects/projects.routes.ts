@@ -9,10 +9,14 @@ import {
   listProjectsQuery,
   addMemberSchema,
 } from './projects.schemas';
+import { projectTasksRouter } from '../tasks/tasks.routes';
 
 const router = Router();
 
 router.use(requireAuth);
+
+// Task creation/listing is scoped under a project.
+router.use('/:projectId/tasks', projectTasksRouter);
 
 router.get('/', validateQuery(listProjectsQuery), controller.list);
 router.post('/', requireRole('MANAGER'), validateBody(createProjectSchema), controller.create);
