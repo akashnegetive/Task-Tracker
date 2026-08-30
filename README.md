@@ -39,8 +39,8 @@ docker compose up -d
 cd server
 cp .env.example .env          # adjust if needed
 npm install
-npm run prisma:migrate        # create schema
-npm run seed                  # demo users + sample data
+npm run migrate               # apply SQL migrations
+npm run seed                  # demo users + sample data (resets the DB)
 npm run dev                   # http://localhost:4000
 
 # 3. frontend (new terminal)
@@ -56,11 +56,25 @@ Demo credentials are listed in [`SUBMISSION.md`](SUBMISSION.md).
 
 Backend (`server/`):
 - `npm run dev` — start API with hot reload
-- `npm run build` / `npm start` — production build & run
-- `npm run prisma:migrate` — apply migrations
+- `npm run build` / `npm start` — compile & run
+- `npm run migrate` — apply SQL migrations
 - `npm run seed` — reset & seed demo data
-- `npm test` — API + lifecycle tests
+- `npm test` — 26 API + lifecycle integration tests
 
 Frontend (`client/`):
-- `npm run dev` — Vite dev server
+- `npm run dev` — Vite dev server (proxies `/api` → :4000)
 - `npm run build` — production build
+
+## Deployment
+
+Deploys as a single web service (the API serves the built SPA) plus managed Postgres. Step-by-step
+GitHub + Neon + Render instructions are in [`docs/deploy.md`](docs/deploy.md); a `render.yaml`
+blueprint is included.
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md) — components, request path, what wasn't built
+- [`docs/schema.md`](docs/schema.md) — tables, constraints, denormalization, scaling
+- [`docs/decisions.md`](docs/decisions.md) — key decisions (incl. the ORM reversal)
+- [`docs/plan.md`](docs/plan.md) — sessions, estimates vs actual, cuts
+- [`docs/ai-prompts.md`](docs/ai-prompts.md) — AI usage log, incl. wrong turns

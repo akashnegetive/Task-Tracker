@@ -1,0 +1,16 @@
+{
+  "name": "tasktracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project & task tracking application — monorepo (client + server).",
+  "scripts": {
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build && npm --prefix server install --include=dev && npm --prefix server run build",
+    "migrate": "npm --prefix server run migrate:prod",
+    "seed": "npm --prefix server run seed:prod",
+    "start": "npm --prefix server run start",
+    "test": "npm --prefix server test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

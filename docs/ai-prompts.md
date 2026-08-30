@@ -35,4 +35,44 @@ minutes and improved the design story.
 **Lesson applied afterwards:** verify tools actually execute in the target environment before
 committing an architecture to them.
 
-_(More entries are added as the build progresses.)_
+## 3. Verification approach — a wrong turn that wasted time
+
+**Prompt (paraphrased):** "Run the API in the background and curl the endpoints to smoke-test."
+
+**Result:** Repeatedly failed. The sandbox reaps background processes between shell invocations, so
+the server would report "listening" and then be gone by the next command, and some calls returned a
+misleading exit code. I burned time chasing "why did the server die" before recognising the pattern.
+
+**Correction:** Pivoted verification to **supertest**, which drives the Express app in-process (no
+port, no background process). This runs to completion in one call and became the real, durable test
+suite (26 tests). For the one thing that genuinely needs a live server (the SPA being served), I
+started it detached with `setsid` and checked it in a separate call.
+
+**Lesson:** when the environment fights a testing approach, change the approach rather than the
+environment.
+
+## 4. Task list query typing — a small wrong answer
+
+**Prompt (paraphrased):** "Type the `validateQuery` middleware generically as
+`ZodSchema<T>` and infer `T`."
+
+**Result:** TypeScript rejected it. Schemas with `.default()` have different *input* and *output*
+types, which `ZodSchema<T>` (input = output = T) can't represent, so passing the list-query schema
+failed to compile.
+
+**Correction:** Relaxed the helper to accept `ZodTypeAny` and cast the parsed result at the call
+site. Correct and pragmatic; the alternative (threading input/output type params everywhere) wasn't
+worth it.
+
+## 5. Frontend build errors
+
+**Prompt (paraphrased):** "Wire the API client with `import.meta.env.VITE_API_URL` and build."
+
+**Result:** Two compile errors — `import.meta.env` wasn't typed (missing `vite/client` reference),
+and passing a named `interface` where `Record<string, unknown>` was expected failed because TS
+interfaces lack an implicit index signature.
+
+**Correction:** Added `/// <reference types="vite/client" />` and cast the filter objects at the two
+call sites. Both are well-known TS/Vite footguns; quick fixes once identified.
+
+_(This log is chronological and was written as the build happened, not reconstructed afterward.)_

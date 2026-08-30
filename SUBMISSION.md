@@ -8,7 +8,13 @@
 ## Notes for the reviewer
 
 - The API enforces every authorization and lifecycle rule server-side; the UI only reflects them.
+  Good things to try: log in as a **member** and confirm you can't create/archive projects or move a
+  task you aren't assigned to; try to start a task that's blocked by an unfinished dependency; open a
+  task's timeline to see the immutable history.
+- The **history table is append-only at the database level** (a trigger rejects UPDATE/DELETE), not
+  just in application code.
 - If the deploy host sleeps when idle, the first request after a pause may take up to a minute.
+- 26 server integration tests: `cd server && npm test`.
 
 ## Demo credentials
 
@@ -45,12 +51,30 @@
 
 ## How much time did I actually spend?
 
-_Tracked in docs/plan.md; summarized here at the end._
+Roughly **13–14 hours** end to end (per-session breakdown in `docs/plan.md`). The two overruns were
+the Prisma→Kysely reversal and reworking local verification around the sandbox reaping background
+processes; both are documented.
 
 ## What would I do next, with another 12 hours?
 
-_tbd_
+1. **Real-time updates** (SSE or websockets) so a teammate's change appears without a refetch.
+2. **Full-text search** with `pg_trgm`/`tsvector` + GIN, replacing `ILIKE` (path noted in schema.md).
+3. **A Kanban board view** with drag-and-drop between statuses (respecting the same server lifecycle
+   rules), alongside the current table.
+4. **Frontend test layer** (Playwright E2E for core flows) and unit tests for dashboard
+   date-bucketing edge cases (timezones, week boundaries).
+5. **Refresh-token rotation** and CSRF hardening (double-submit token) for the cookie auth.
+6. **Richer bulk ops** (bulk assign / dependency add) and undo for bulk actions.
 
 ## What am I least happy with in this codebase, and why?
 
-_tbd_
+- **Frontend has no automated tests.** The backend is well covered (26 integration tests), but the
+  React app is verified only by a production build + Playwright screenshots. Given more time the core
+  flows deserve E2E coverage.
+- **`ILIKE '%term%'` search won't scale.** Honest for the demo, but it bypasses indexes for infix
+  matches; I left the proper solution as a documented follow-up rather than half-building it.
+- **A few `any`-typed spots in the query layer** (the dashboard `restrict` helper and the list-query
+  condition builder). Expressing "apply this WHERE across several differently-shaped queries"
+  generically in Kysely got verbose, so I made a deliberate, localized tradeoff. It works and is
+  tested, but it's the code I'd most want to tidy.
+- **Bundle size** (~610 KB) is dominated by Recharts; code-splitting the dashboard route would help.

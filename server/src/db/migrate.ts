@@ -69,22 +69,23 @@ async function reset(pool: Pool): Promise<void> {
   await up(pool);
 }
 
-async function main(): Promise<void> {
-  const command = process.argv[2] ?? 'up';
+/** Programmatic entry point (used by the seed script and the CLI). */
+export async function runMigrations(command: 'up' | 'reset' = 'up'): Promise<void> {
   const pool = new Pool({ connectionString: env.databaseUrl });
   try {
     if (command === 'up') await up(pool);
     else if (command === 'reset') await reset(pool);
-    else {
-      console.error(`Unknown command: ${command}. Use "up" or "reset".`);
-      process.exit(1);
-    }
+    else throw new Error(`Unknown command: ${command}. Use "up" or "reset".`);
   } finally {
     await pool.end();
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Run as a CLI when invoked directly.
+if (require.main === module) {
+  const command = (process.argv[2] ?? 'up') as 'up' | 'reset';
+  runMigrations(command).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

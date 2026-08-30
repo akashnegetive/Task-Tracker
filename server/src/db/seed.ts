@@ -41,8 +41,8 @@ async function drive(user: AuthUser, taskId: string, statuses: string[]): Promis
 async function main(): Promise<void> {
   // eslint-disable-next-line no-console
   console.log('Resetting schema…');
-  const { execSync } = await import('node:child_process');
-  execSync('tsx src/db/migrate.ts reset', { stdio: 'inherit' });
+  const { runMigrations } = await import('./migrate');
+  await runMigrations('reset');
 
   console.log('Seeding users…');
   const maya = await createUser('manager@tasktracker.dev', 'Maya (Manager)', 'MANAGER');

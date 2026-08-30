@@ -43,6 +43,18 @@ Filled in as sessions complete.
 |---------|----------|--------|-------|
 | 1 | 0.5h | ~0.5h | Scaffold + local Postgres (Docker daemon unavailable → ran a native PG cluster). |
 | 2 | 0.75h | ~1.0h | Overran: Prisma blocked by sandbox egress; reversed to Kysely + SQL migrations. |
+| 3 | 0.75h | ~0.75h | Auth, roles, JWT cookie, guards. Smooth. |
+| 4 | 0.75h | ~0.75h | Projects + membership + central access helpers. |
+| 5 | 1.5h | ~1.5h | Tasks + lifecycle + deps + event log — the core; biggest module. |
+| 6+7 | 1.0h | ~1.0h | Merged: one query engine serves both my-tasks and search/filter/sort/paginate. |
+| 8 | 0.5h | ~0.5h | Bulk ops + CSV, reusing per-task services. |
+| 9 | 0.5h | ~0.5h | Timeline read + comments (log already populated by earlier sessions). |
+| 10 | 0.5h | ~0.5h | Overdue alerts + dismissal/reappearance. |
+| 11 | 0.75h | ~0.75h | Dashboard aggregations + 8-week chart. |
+| — | — | ~0.5h | Switched local verification from curl+background server to supertest (sandbox reaps bg procs). |
+| 12 | 2.5h | ~2.5h | React SPA across all features + single-service static serving. |
+| 13 | 0.5h | ~0.5h | Seed through the service layer; 26-test suite grown alongside each feature. |
+| 14 | 0.75h | ~0.75h | Docs finalization + deploy guide. |
 
 ## Cuts
 
@@ -51,3 +63,6 @@ Recorded here as they happen (things deferred when short on time).
 - **Prisma** cut in session 2 (environment couldn't fetch its engine binaries) → Kysely + `pg`.
 - Full-text search deferred: shipping `ilike` search now, `pg_trgm`/`tsvector` noted in schema.md
   as the scale-up path rather than built for the demo.
+- Real-time updates cut in favour of React Query invalidation (see architecture.md).
+- Board drag-and-drop cut: the task list is a filterable table, not a Kanban board with DnD.
+- No per-project roles; org-wide Manager/Member only.
