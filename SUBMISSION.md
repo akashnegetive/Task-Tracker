@@ -12,10 +12,12 @@
 
 ## Demo credentials
 
-| Role    | Email | Password |
-|---------|-------|----------|
-| Manager | _tbd_ | _tbd_    |
-| Member  | _tbd_ | _tbd_    |
+| Role    | Email                     | Password    |
+|---------|---------------------------|-------------|
+| Manager | manager@tasktracker.dev   | password123 |
+| Member  | alice@tasktracker.dev     | password123 |
+| Member  | bob@tasktracker.dev       | password123 |
+| Member  | carol@tasktracker.dev     | password123 |
 
 ## Stack
 
