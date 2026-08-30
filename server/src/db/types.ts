@@ -23,8 +23,8 @@ export interface UsersTable {
   password_hash: string;
   name: string;
   role: ColumnType<Role, Role | undefined, Role>;
-  created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  created_at: Timestamp;
+  updated_at: Timestamp;
 }
 
 export interface ProjectsTable {
@@ -33,8 +33,8 @@ export interface ProjectsTable {
   description: ColumnType<string, string | undefined, string>;
   status: ColumnType<ProjectStatus, ProjectStatus | undefined, ProjectStatus>;
   created_by_id: string;
-  created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  created_at: Timestamp;
+  updated_at: Timestamp;
   archived_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
@@ -42,7 +42,7 @@ export interface ProjectMembershipsTable {
   id: Generated<string>;
   project_id: string;
   user_id: string;
-  created_at: Generated<Timestamp>;
+  created_at: Timestamp;
 }
 
 export interface TasksTable {
@@ -54,8 +54,8 @@ export interface TasksTable {
   status: ColumnType<TaskStatus, TaskStatus | undefined, TaskStatus>;
   due_date: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
   created_by_id: string;
-  created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  created_at: Timestamp;
+  updated_at: Timestamp;
   completed_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
@@ -64,14 +64,14 @@ export interface TaskAssigneesTable {
   task_id: string;
   user_id: string;
   assigned_by_id: string;
-  assigned_at: Generated<Timestamp>;
+  assigned_at: Timestamp;
 }
 
 export interface TaskDependenciesTable {
   id: Generated<string>;
   task_id: string;
   depends_on_task_id: string;
-  created_at: Generated<Timestamp>;
+  created_at: Timestamp;
 }
 
 export interface TaskEventsTable {
@@ -84,7 +84,7 @@ export interface TaskEventsTable {
   new_value: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata: ColumnType<any | null, any | null | undefined, any | null>;
-  created_at: Generated<Timestamp>;
+  created_at: Timestamp;
 }
 
 export interface OverdueDismissalsTable {
@@ -92,7 +92,7 @@ export interface OverdueDismissalsTable {
   task_id: string;
   user_id: string;
   due_date_at_dismissal: ColumnType<Date, Date | string, Date | string>;
-  dismissed_at: Generated<Timestamp>;
+  dismissed_at: Timestamp;
 }
 
 export interface Database {

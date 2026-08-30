@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './modules/auth/auth.routes';
+import usersRoutes from './modules/users/users.routes';
+import projectsRoutes from './modules/projects/projects.routes';
 
 /** Root API router — feature modules mount here. */
 const api = Router();
@@ -9,5 +11,7 @@ api.get('/health', (_req, res) => {
 });
 
 api.use('/auth', authRoutes);
+api.use('/users', usersRoutes);
+api.use('/projects', projectsRoutes);
 
 export default api;
