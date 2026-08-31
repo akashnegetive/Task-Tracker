@@ -8,6 +8,16 @@ import { PriorityBadge, StatusBadge, formatDate, Spinner, ErrorNote, EmptyState 
 const STATUS_OPTIONS = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE', 'CANCELLED'];
 const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 
+// Client-side mirror of the server's lifecycle state machine — used only to keep the
+// bulk menu honest (offer just the legal next states). The server still enforces it.
+const NEXT: Record<string, string[]> = {
+  TODO: ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['IN_REVIEW', 'TODO', 'CANCELLED'],
+  IN_REVIEW: ['DONE', 'IN_PROGRESS', 'CANCELLED'],
+  DONE: ['IN_PROGRESS'],
+  CANCELLED: ['TODO'],
+};
+
 interface Props {
   filters: TaskFilters;
   onFilters: (f: TaskFilters) => void;
@@ -31,8 +41,24 @@ export function TaskListView({ filters, onFilters, query, exportPath, enableBulk
       return n;
     });
 
+  // Statuses reachable from EVERY selected task (empty = the selection has no common next state).
+  const selectedItems = (data?.items ?? []).filter((t) => selected.has(t.id));
+  const validTransitions = STATUS_OPTIONS.filter(
+    (s) => selectedItems.length > 0 && selectedItems.every((t) => NEXT[t.status]?.includes(s)),
+  );
+
+  // Keep the chosen op sensible: if it's a transition that's no longer valid for the
+  // current selection, fall back to the first valid transition (or a priority change).
+  const bulkIsInvalidTransition =
+    bulkOp.startsWith('transition:') && !validTransitions.includes(bulkOp.split(':')[1]);
+  const effectiveBulkOp = bulkIsInvalidTransition
+    ? validTransitions.length
+      ? `transition:${validTransitions[0]}`
+      : `priority:${PRIORITY_OPTIONS[0]}`
+    : bulkOp;
+
   const applyBulk = async () => {
-    const [type, value] = bulkOp.split(':');
+    const [type, value] = effectiveBulkOp.split(':');
     const operation =
       type === 'transition' ? { type: 'transition', status: value } : { type: 'setPriority', priority: value };
     const res = await bulk.mutateAsync({ taskIds: [...selected], operation });
@@ -93,11 +119,15 @@ export function TaskListView({ filters, onFilters, query, exportPath, enableBulk
       {enableBulk && selected.size > 0 && (
         <div className="bulk-bar">
           <span>{selected.size} selected</span>
-          <select value={bulkOp} onChange={(e) => setBulkOp(e.target.value)}>
+          <select value={effectiveBulkOp} onChange={(e) => setBulkOp(e.target.value)}>
             <optgroup label="Transition to">
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={`transition:${s}`}>Move to {s}</option>
-              ))}
+              {validTransitions.length === 0 ? (
+                <option disabled>No shared next status</option>
+              ) : (
+                validTransitions.map((s) => (
+                  <option key={s} value={`transition:${s}`}>Move to {s}</option>
+                ))
+              )}
             </optgroup>
             <optgroup label="Set priority">
               {PRIORITY_OPTIONS.map((p) => (
