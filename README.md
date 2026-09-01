@@ -12,8 +12,8 @@ and overdue alerts. Full-stack TypeScript, with every rule enforced server-side.
 
 ## 🔗 Live demo & login
 
-- **Live app:** https://tasktracker-k6dz.onrender.com
-- **Source:** https://github.com/akashnegetive/Task-Tracker
+- **Live app:** [https://tasktracker-k6dz.onrender.com](https://tasktracker-k6dz.onrender.com)
+- **Source:** [https://github.com/akashnegetive/Task-Tracker](https://github.com/akashnegetive/Task-Tracker)
 
 > First load on the free tier can take ~30–60s while the server wakes up.
 
